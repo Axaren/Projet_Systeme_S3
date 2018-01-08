@@ -2,8 +2,8 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "make-sockaddr.h"
-#include "EnvoiDonnees.h"
+#include "../utils/make-sockaddr.h"
+#include "../utils/EnvoiDonnees.h"
 
 using namespace std;
 
