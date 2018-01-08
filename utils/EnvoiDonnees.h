@@ -1,6 +1,8 @@
 #ifndef ENVOI_DONNEES_H
 #define ENVOI_DONnEES_H
 
+#include <arpa/inet.h>
+#include <cstring>
 #include <string>
 
 class EnvoiDonnees
