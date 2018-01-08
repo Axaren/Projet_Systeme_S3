@@ -2,14 +2,6 @@
 
 #include "make-sockaddr.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#include <cstring>
-
 /*
  * retourne une adresse de socket IPv4
  * pour une machine et un service donnés

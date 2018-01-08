@@ -1,7 +1,7 @@
 #ifndef MAKE_SOCKADDR_H
 #define MAKE_SOCKADDR_H
 
-#include <string>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

@@ -1,6 +1,4 @@
 #include "EnvoiDonnees.h"
-#include <arpa/inet.h>
-#include <cstring>
 
 EnvoiDonnees::EnvoiDonnees(const std::string & id, std::string position, unsigned int cap)
     :

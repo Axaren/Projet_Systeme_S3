@@ -2,8 +2,8 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "../utils/make-sockaddr.h"
 #include "../utils/EnvoiDonnees.h"
+#include "../utils/make-sockaddr.h"
 
 using namespace std;
 
@@ -32,4 +32,3 @@ int main(int argc, char* argv[])
           close(fd);
 
 }
-
