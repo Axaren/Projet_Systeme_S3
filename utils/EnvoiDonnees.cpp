@@ -1,11 +1,10 @@
 #include "EnvoiDonnees.h"
 
-EnvoiDonnees::EnvoiDonnees(const std::string & id, std::string position, unsigned int cap)
+EnvoiDonnees::EnvoiDonnees(const std::string & id, int x, int y, unsigned int cap)
     :
-      m_cap { htonl(cap) }
+      m_cap { htonl(cap) }, m_positionX { htonl(x) }, m_positionY { htonl(y) }
 {
     strncpy(m_id, id.c_str(), TAILLE_MAX);
-    strncpy(m_position, position.c_str(), 3);
 }
 
 std::string EnvoiDonnees::id() const
@@ -13,9 +12,14 @@ std::string EnvoiDonnees::id() const
     return { m_id };
 }
 
-std::string EnvoiDonnees::position() const
+int EnvoiDonnees::getX() const
 {
-    return { m_position };
+    return ntohl(m_positionX);
+}
+
+int EnvoiDonnees::getY() const
+{
+    return ntohl(m_positionY);
 }
 
 unsigned int EnvoiDonnees::cap() const
