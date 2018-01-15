@@ -19,7 +19,7 @@ std::vector<EnvoiDonnees> messagesBalises;
 
 void UDPserv(std::string port) {
     auto adresse_locale = local_socket_address(SOCK_DGRAM, port);
-    int fd = socket(AF_INET, SOCK_DGRAM, 0); // adresse et socket
+    int fd = socket(AF_INET, SOCK_DGRAM, 0); // SOCK_DGRAM pour datagramme UDP
 
     bind(fd, (sockaddr *) & adresse_locale, sizeof(adresse_locale)); // lie le server à l'adresse locale
 
@@ -32,20 +32,20 @@ void UDPserv(std::string port) {
                 break;
             }
             messagesBalises.push_back(m);
-            std::cout << "Message reçu" << std::endl; // TODO ajouter le detail
+            std::cout << "Message reçu" << std::endl;
         }
     }
 }
 
 void TCPserv(std::string port) {
     auto adresse_locale = local_socket_address(SOCK_STREAM, port);
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM pour flux TCP
     struct sockaddr_in cli_addr;
     socklen_t clilen;
     char buffer[256];
 
     if (fd < 0) {
-        perror("ERROR opening socket");
+        cerr << "ECHEC de l'ouverture du socket";
         exit(1);
     }
 
@@ -53,57 +53,58 @@ void TCPserv(std::string port) {
 
     std::cout << "** Serveur TCP pour les balises port " << port << std::endl;
 
-    listen(fd, 15);
-    clilen = sizeof(cli_addr);
+    while(true) {
+        listen(fd, 15);
+        clilen = sizeof(cli_addr);
 
-    /* Accept actual connection from the client */
-    int newfd = accept(fd, (struct sockaddr *)&cli_addr, &clilen);
+        // Accepte la connection du client
+        int newfd = accept(fd, (struct sockaddr *)&cli_addr, &clilen);
 
-    if (newfd < 0) {
-        perror("ERROR on accept");
-        exit(1);
-    }
+        if (newfd < 0) {
+            cerr << "ECHEC de l'accept" << endl;
+            exit(1);
+        }
 
-    /* If connection is established then start communicating */
-    bzero(buffer,256);
-    int n = read( newfd,buffer,255 );
+        // Si la connection est établie, commence la communication
+        bzero(buffer,256); // vide le buffer
+        int n = read( newfd,buffer,255 );
 
-    if (n < 0) {
-        perror("ERROR reading from socket");
-        exit(1);
-    }
+        if (n < 0) {
+            cerr << "ECHEC de la lecture depuis le socket" << endl;
+            exit(1);
+        }
 
-    /* Write a response to the client */
-    string response;
+        // Ecrit la réponse au client
+        string response;
 
-    if(string(buffer) == "balises\n") {
+        if(string(buffer) == "balises\n") {
 
-        if(messagesBalises.size() == 0)
-            response = "aucunes balises";
-        else
-            for(auto balise : messagesBalises) {
-                response +=
-                        balise.id() + " " +
-                        to_string(balise.getX()) + " " +
-                        to_string(balise.getY()) + " " +
-                        to_string(balise.cap()) + "\n";
-            }
-    }
+            if(messagesBalises.size() == 0)
+                response = "aucunes balises";
+            else
+                for(auto balise : messagesBalises) {
+                    response +=
+                            balise.id() + " " +
+                            to_string(balise.getX()) + " " +
+                            to_string(balise.getY()) + " " +
+                            to_string(balise.cap()) + "\n";
+                }
+        }
 
-    n = write(newfd,response.c_str(),255); // 255 -> taille max du string
+        n = write(newfd,response.c_str(),255); // 255 -> taille max du string
 
-    if (n < 0) {
-        perror("ERROR writing to socket");
-        exit(1);
+        if (n < 0) {
+            cerr << "ECHEC impossible d'ecrire au socket" << endl;
+            exit(1);
+        }
     }
 }
 
 int main(int argc,  char* argv[])
 {
     // Base de donnée des positions :
-    // Il me faut :
-    // — un objet messageBalise avec un identifiant, une position (de la forme X,Y),  ?
-    // — une structure de donnée à taille variable pour stocker les messages -> vector
+    // — un objet messageBalise avec un identifiant, une position et un cap
+    // — une structure de donnée à taille variable pour stocker les messages -> vecteur
 
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " port" << std::endl;
@@ -112,15 +113,15 @@ int main(int argc,  char* argv[])
 
     // Thread 1 :
     // Le serveur UDP -> réutilisation du serveur téléthon
-    std::thread UDPServer(UDPserv, argv[1]); // spawn new thread that calls serverUDP()
+    std::thread UDPServer(UDPserv, argv[1]); // invoque un nouveau thread qui lance serverUDP()
 
     // Thread 2 :
     // Le serveur TCP
-    std::thread TCPServer(TCPserv, argv[1]);  // spawn new thread that calls serverTCP()
+    std::thread TCPServer(TCPserv, argv[1]);  // invoque un nouveau thread qui lance serverTCP()
 
     // synchronize threads:
-    UDPServer.join();               // pauses until first finishes
-    TCPServer.join();               // pauses until second finishes
+    UDPServer.join();               // attend que le premier thread se finisse
+    TCPServer.join();               // attend que le second  thread se finisse
 
-    std::cout << "FIN" << std::endl; // TODO afficher tous les messages des balises
+    std::cout << "FIN" << std::endl;
 }
