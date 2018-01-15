@@ -1,0 +1,13 @@
+
+Mon Jan 15 10:30:37 2018
+SUCCES : Socket de connection ouvert
+
+Mon Jan 15 10:31:15 2018
+SUCCES : Requete du client acceptee
+
+Mon Jan 15 10:31:18 2018
+SUCCES : Message recu = balises
+
+
+Mon Jan 15 10:31:18 2018
+Consultation de la liste des balises effectuée
